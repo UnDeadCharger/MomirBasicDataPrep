@@ -1,0 +1,321 @@
+@font-face {
+  font-family: "Monofonto";
+  src: url("Monofonto-Regular.woff2") format("woff2"),
+    url("Monofonto-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --pick-angle: 0deg;
+}
+
+@keyframes stressLvl1 {
+  0%,
+  100% {
+    transform: rotate(calc(var(--pick-angle) + 0deg));
+  }
+  50% {
+    transform: rotate(calc(var(--pick-angle) + 2deg));
+  }
+}
+@keyframes stressLvl2 {
+  0%,
+  50%,
+  100% {
+    transform: rotate(calc(var(--pick-angle) + 0deg));
+  }
+  25% {
+    transform: rotate(calc(var(--pick-angle) - 2deg));
+  }
+  75% {
+    transform: rotate(calc(var(--pick-angle) + 2deg));
+  }
+}
+@keyframes stressLvl3 {
+  0%,
+  50%,
+  100% {
+    transform: rotate(calc(var(--pick-angle) + 0deg));
+  }
+  25% {
+    transform: rotate(calc(var(--pick-angle) - 5deg));
+  }
+  75% {
+    transform: rotate(calc(var(--pick-angle) + 5deg));
+  }
+}
+
+.stress1 {
+  animation: stressLvl1 0.2s ease-in-out infinite;
+}
+.stress2 {
+  animation: stressLvl2 0.2s ease-in-out infinite;
+}
+.stress3 {
+  animation: stressLvl3 0.2s ease-in-out infinite;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100vh;
+  margin: 0;
+}
+.gameContainer {
+  display: flex;
+  flex: 1;
+  background: #000000e9;
+}
+
+.game {
+  display: flex;
+  position: relative;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+summary {
+  position: absolute;
+  color: rgb(255 182 36);
+  -webkit-text-stroke: 0.5px rgb(255 182 36 / 10%);
+  font-family: Monofonto;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+summary > * {
+  display: inline-block;
+  margin: 0px 50px;
+}
+
+.counter {
+  text-align: end;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.lock {
+  width: 200px;
+  height: 200px;
+  background: #ced4da;
+  border-radius: 250px;
+  content: "";
+  border: #9fa7af solid 18px;
+  border-top: #a7b0b6 solid 18px;
+  outline: 2px solid black;
+  /* border-left-color: green; */
+  /* outline: gray solid 20px; */
+  /* outline-offset: 10px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-clip: padding-box;
+  /* background: conic-gradient(
+    red 6deg,
+    orange 6deg 18deg,
+    yellow 18deg 45deg,
+    green 45deg 110deg,
+    blue 110deg 200deg,
+    purple 200deg
+  ); */
+}
+
+.groove {
+  width: 120px;
+  height: 120px;
+  background: #868e96;
+  border-radius: 250px;
+  content: "";
+  border: #9fa7af solid 2px;
+  /* border-left-color: green; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-clip: padding-box;
+  z-index: 1;
+  transform: translateY(-2px);
+}
+
+.groove::before {
+  top: -10px;
+  content: "";
+  width: 30px;
+  height: 40px;
+  background: #343a40;
+  border-left: 1px solid #000000;
+  border-right: 1px solid #000000;
+  position: absolute;
+}
+
+.groove::after {
+  top: 100px;
+  content: "";
+  width: 0;
+  height: 40px;
+  position: absolute;
+  border-left: 16px solid #000000;
+  border-right: 16px solid #ced4da;
+  z-index: 2;
+}
+
+.hole {
+  width: 32px;
+  height: 120px;
+  background: #000000;
+  margin-top: 20px;
+  z-index: 3;
+}
+
+.outerhold {
+  width: 350px;
+  height: 350px;
+  background: #ced4da;
+  border-radius: 250px;
+  content: "";
+  border: black solid 2px;
+  /* border-left-color: green; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-clip: padding-box;
+  /* background: conic-gradient(
+    red 6deg,
+    orange 6deg 18deg,
+    yellow 18deg 45deg,
+    green 45deg 110deg,
+    blue 110deg 200deg,
+    purple 200deg
+  ); */
+}
+
+.pick {
+  position: absolute;
+  width: 600px;
+  height: 12px;
+  /* border-radius: 250px; */
+  transform: rotate(var(--pick-angle));
+  content: "";
+  background: linear-gradient(
+    90deg,
+    #b87333 5%,
+    #a3652c 5%,
+    #a3652c 10%,
+    #b87333 10%,
+    #b87333 15%,
+    #a3652c 15%,
+    #a3652c 20%,
+    #b87333 20%,
+    #b87333 25%,
+    #a3652c 25%,
+    #a3652c 30%,
+    #b87333 30%,
+    #b87333 50%,
+    #ffffff00 50%,
+    #ffffff00 100%
+  );
+  /* animation: stressLvl3 0.5s ease-in-out infinite; */
+  /* background: blue; */
+  /* border: transparent solid 200px; */
+  /* border-left-color: blue; */
+}
+
+.pickHead {
+  position: absolute;
+  width: 600px;
+  height: 12px;
+  transform: rotate(var(--pick-angle));
+  content: "";
+  background: linear-gradient(
+    90deg,
+    #ffffff00 0%,
+    #ffffff00 48%,
+    #343a40 50%,
+    #343a40 51%,
+    #ffffff00 50%,
+    #ffffff00 100%
+  );
+}
+
+.background {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background: #000000;
+  overflow: hidden;
+  z-index: -1;
+}
+.doorframe {
+  height: 100%;
+  width: 10%;
+  background: #343a40;
+  border: #868e96 solid 10px;
+}
+
+@keyframes doorSwing {
+  0% {
+    transform: scaleX(100%) skewY(0deg);
+  }
+  100% {
+    transform: scaleX(70%) skewY(5deg);
+  }
+}
+.door {
+  height: 130%;
+  width: 80%;
+  background: repeating-linear-gradient(
+    0deg,
+    #b68e65,
+    #b68e65 25%,
+    #986b41 25%,
+    #986b41 30%,
+    #b68e65 30%,
+    #b68e65 75%,
+    #986b41 75%,
+    #986b41 80%,
+    #b68e65 80%
+  );
+  transform-origin: right;
+  /* animation: doorSwing 2s ease-in-out infinite; */
+  position: relative; /* Explicitly set positioning context => when animation is being applied, this item will have relative position */
+}
+
+/*Door knob */
+.door::before {
+  content: "";
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: #ffd700;
+  border-radius: 250px;
+  top: 50%;
+  left: 10%;
+}
+
+.door::after {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  background: #ced4da;
+  border: #9fa7af solid 1px;
+  border-radius: 250px;
+  top: 60%;
+  left: 11.5%;
+}
