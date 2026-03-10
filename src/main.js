@@ -3,7 +3,8 @@ const debugContent = document.getElementById("debug-content");
 const startDownloadButton = document.getElementById("start-download");
 const selectPathButton = document.getElementById("select-path");
 
-let targetedWritable = null;
+let dirHandle = null;
+let mappedDir = {};
 
 async function getBulkData() {
   const data = await fetch("https://api.scryfall.com/bulk-data/oracle_cards");
@@ -26,6 +27,7 @@ async function getBulkData() {
     jsonData[newIndex] = {
       name: jsonData[i].name,
       mana_cost: jsonData[i].mana_cost,
+      cmc: jsonData[i].cmc,
       type_line: jsonData[i].type_line,
       oracle_text: jsonData[i].oracle_text,
       power: jsonData[i].power,
@@ -39,26 +41,54 @@ async function getBulkData() {
   jsonData = jsonData.slice(0, newIndex);
   console.log(jsonData[0]);
   console.log("file size", new Blob([JSON.stringify(jsonData)]).size);
-  if (targetedWritable) {
-    console.log("writing to file...");
-    await targetedWritable.write(JSON.stringify(jsonData));
-    await targetedWritable.close();
-    console.log("file written successfully");
+  if (dirHandle) {
+    try {
+      console.log("writing to file...");
+      console.time();
+      for (const card of jsonData) {
+        const cmc = card.cmc;
+        const subDir = await getSubDirectoryHandle(cmc, dirHandle);
+        await writeToFile(subDir, card);
+      }
+      console.log("file written successfully");
+      console.timeLog();
+      console.timeEnd();
+    } catch (e) {
+      console.error("FAILL", e);
+    }
+  }
+}
+
+async function getSubDirectoryHandle(manaValue, dirHandle) {
+  if (!mappedDir[manaValue]) {
+    mappedDir[manaValue] = await dirHandle.getDirectoryHandle(manaValue, {
+      create: true,
+    });
+  }
+  return mappedDir[manaValue];
+}
+
+async function writeToFile(dirHandle, cardData) {
+  try {
+    const safeName = cardData.name.replace(/[<>:"/\\|?*]/g, "_");
+    const fileHandle = await dirHandle.getFileHandle(`${safeName}.json`, {
+      create: true,
+    });
+
+    const writable = await fileHandle.createWritable();
+
+    writable.write(JSON.stringify(cardData));
+    writable.close();
+  } catch (e) {
+    console.log("FAIL", e, cardData);
   }
 }
 
 async function selectPath() {
-  const dirHandle = await window.showDirectoryPicker({
+  dirHandle = await window.showDirectoryPicker({
     id: "sd-picker",
     mode: "readwrite",
   });
-  const fileHandle = await dirHandle.getFileHandle("cards.json", {
-    create: true,
-  });
-  const writable = await fileHandle.createWritable();
-
-  targetedWritable = writable;
-  console.log(targetedWritable);
 }
 
 startDownloadButton.onclick = getBulkData;
