@@ -24,6 +24,8 @@ async function getBulkData() {
     if (jsonData[i].layout === "token") continue;
     if (jsonData[i].card_faces) continue;
 
+    if (jsonData[i].promo_types?.includes("playtest")) continue;
+
     jsonData[newIndex] = {
       name: jsonData[i].name,
       mana_cost: jsonData[i].mana_cost,
@@ -41,22 +43,35 @@ async function getBulkData() {
   jsonData = jsonData.slice(0, newIndex);
   console.log(jsonData[0]);
   console.log("file size", new Blob([JSON.stringify(jsonData)]).size);
+
+  const chunkSize = newIndex / (70 - 1);
+  const newChunk = _.chunk(jsonData, chunkSize);
+  console.log("chunk size", chunkSize, newChunk.length, newChunk);
   if (dirHandle) {
-    try {
-      console.log("writing to file...");
-      console.time();
-      for (const card of jsonData) {
-        const cmc = card.cmc;
-        const subDir = await getSubDirectoryHandle(cmc, dirHandle);
-        await writeToFile(subDir, card);
-      }
-      console.log("file written successfully");
-      console.timeLog();
-      console.timeEnd();
-    } catch (e) {
-      console.error("FAILL", e);
-    }
+    console.time("processing batches");
+    Promise.all(newChunk.map((chunk) => processBatch(chunk))).then(() => {
+      console.log("All batches processed");
+      console.timeEnd("processing batches");
+    });
   }
+}
+
+async function writeCardData(cardData) {
+  const cmc = cardData.cmc;
+
+  const subDir = await getSubDirectoryHandle(cmc, dirHandle);
+
+  // console.time("writing file");
+  await writeToFile(subDir, cardData);
+  // console.timeEnd("writing file");
+}
+
+async function processBatch(cards) {
+  console.timeLog("processing batches");
+  for (const card of cards) {
+    await writeCardData(card);
+  }
+  console.timeLog("processing batches");
 }
 
 async function getSubDirectoryHandle(manaValue, dirHandle) {
@@ -76,7 +91,6 @@ async function writeToFile(dirHandle, cardData) {
     });
 
     const writable = await fileHandle.createWritable();
-
     writable.write(JSON.stringify(cardData));
     writable.close();
   } catch (e) {
